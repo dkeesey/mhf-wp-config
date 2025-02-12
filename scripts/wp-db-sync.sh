@@ -128,15 +128,88 @@ db_operation() {
         echo "Pulling from production..."
         if [ -z "$DRY_RUN" ]; then
             echo "Exporting production database..."
-            # Use SSH to run mysqldump on production with direct credentials
-            ssh wp_jqukgi@masumihayashifoundation "mysqldump -h mysql.masumihayashifoundation.org -u z2d9giq -p'dean70?!' masumihayashifoundation__2 --no-tablespaces --skip-lock-tables" > "$temp_file" 2>/dev/null
+            # Export specific menu data and core options from production
+            echo "SET FOREIGN_KEY_CHECKS=0;" > "$temp_file"
+            echo "-- Exporting WordPress core options" >> "$temp_file"
+            
+            # Export core WordPress options
+            ssh wp_jqukgi@masumihayashifoundation "cd masumihayashifoundation.org && \
+                mysqldump -h mysql.masumihayashifoundation.org -u z2d9giq -p'dean70?!' \
+                --no-create-info --compact --no-tablespaces \
+                masumihayashifoundation__2 wp_6v2wft_options \
+                --where=\"option_name IN ('siteurl', 'home', 'blogname', 'blogdescription', \
+                'admin_email', 'template', 'stylesheet', 'active_plugins', 'timezone_string', \
+                'blog_public', 'users_can_register', 'db_version')\"" >> "$temp_file" 2>/dev/null
+
+            # Export users and user meta
+            ssh wp_jqukgi@masumihayashifoundation "cd masumihayashifoundation.org && \
+                mysqldump -h mysql.masumihayashifoundation.org -u z2d9giq -p'dean70?!' \
+                --no-create-info --compact --no-tablespaces \
+                masumihayashifoundation__2 wp_6v2wft_users wp_6v2wft_usermeta" >> "$temp_file" 2>/dev/null
+            
+            echo "-- Exporting Top Menu structure" >> "$temp_file"
+            
+            # Export menu term (Top Menu)
+            ssh wp_jqukgi@masumihayashifoundation "cd masumihayashifoundation.org && \
+                mysqldump -h mysql.masumihayashifoundation.org -u z2d9giq -p'dean70?!' \
+                --no-create-info --compact --no-tablespaces \
+                masumihayashifoundation__2 wp_6v2wft_terms \
+                --where=\"term_id IN (2)\"" >> "$temp_file" 2>/dev/null
+            
+            # Export menu taxonomy
+            ssh wp_jqukgi@masumihayashifoundation "cd masumihayashifoundation.org && \
+                mysqldump -h mysql.masumihayashifoundation.org -u z2d9giq -p'dean70?!' \
+                --no-create-info --compact --no-tablespaces \
+                masumihayashifoundation__2 wp_6v2wft_term_taxonomy \
+                --where=\"term_id IN (2)\"" >> "$temp_file" 2>/dev/null
+            
+            # Export menu items (Home, Blog, About, Acknowledgements)
+            ssh wp_jqukgi@masumihayashifoundation "cd masumihayashifoundation.org && \
+                mysqldump -h mysql.masumihayashifoundation.org -u z2d9giq -p'dean70?!' \
+                --no-create-info --compact --no-tablespaces \
+                masumihayashifoundation__2 wp_6v2wft_posts \
+                --where=\"ID IN (47, 48, 49, 167)\"" >> "$temp_file" 2>/dev/null
+            
+            # Export menu item metadata
+            ssh wp_jqukgi@masumihayashifoundation "cd masumihayashifoundation.org && \
+                mysqldump -h mysql.masumihayashifoundation.org -u z2d9giq -p'dean70?!' \
+                --no-create-info --compact --no-tablespaces \
+                masumihayashifoundation__2 wp_6v2wft_postmeta \
+                --where=\"post_id IN (47, 48, 49, 167)\"" >> "$temp_file" 2>/dev/null
+            
+            # Export menu relationships
+            ssh wp_jqukgi@masumihayashifoundation "cd masumihayashifoundation.org && \
+                mysqldump -h mysql.masumihayashifoundation.org -u z2d9giq -p'dean70?!' \
+                --no-create-info --compact --no-tablespaces \
+                masumihayashifoundation__2 wp_6v2wft_term_relationships \
+                --where=\"object_id IN (47, 48, 49, 167)\"" >> "$temp_file" 2>/dev/null
+            
+            echo "SET FOREIGN_KEY_CHECKS=1;" >> "$temp_file"
             if [ $? -ne 0 ]; then
                 echo "Error: Failed to export production database"
                 return 1
             fi
 
             echo "Importing production database..."
-            # Import using direct MySQL command
+            # Clear existing data
+            echo "Clearing existing data..."
+            # Clear core options
+            "$MYSQL_PATH" "${MYSQL_OPTS[@]}" "$DB_NAME" -e "DELETE FROM wp_6v2wft_options WHERE option_name IN \
+                ('siteurl', 'home', 'blogname', 'blogdescription', 'admin_email', 'template', \
+                'stylesheet', 'active_plugins', 'timezone_string', 'blog_public', 'users_can_register', 'db_version');" 2>/dev/null
+
+            # Clear users and user meta
+            "$MYSQL_PATH" "${MYSQL_OPTS[@]}" "$DB_NAME" -e "DELETE FROM wp_6v2wft_users;" 2>/dev/null
+            "$MYSQL_PATH" "${MYSQL_OPTS[@]}" "$DB_NAME" -e "DELETE FROM wp_6v2wft_usermeta;" 2>/dev/null
+            
+            # Clear menu data
+            "$MYSQL_PATH" "${MYSQL_OPTS[@]}" "$DB_NAME" -e "DELETE FROM wp_6v2wft_terms WHERE term_id = 2;" 2>/dev/null
+            "$MYSQL_PATH" "${MYSQL_OPTS[@]}" "$DB_NAME" -e "DELETE FROM wp_6v2wft_term_taxonomy WHERE term_id = 2;" 2>/dev/null
+            "$MYSQL_PATH" "${MYSQL_OPTS[@]}" "$DB_NAME" -e "DELETE FROM wp_6v2wft_posts WHERE ID IN (47, 48, 49, 167);" 2>/dev/null
+            "$MYSQL_PATH" "${MYSQL_OPTS[@]}" "$DB_NAME" -e "DELETE FROM wp_6v2wft_postmeta WHERE post_id IN (47, 48, 49, 167);" 2>/dev/null
+            "$MYSQL_PATH" "${MYSQL_OPTS[@]}" "$DB_NAME" -e "DELETE FROM wp_6v2wft_term_relationships WHERE object_id IN (47, 48, 49, 167);" 2>/dev/null
+            
+            # Import the production database
             "$MYSQL_PATH" "${MYSQL_OPTS[@]}" "$DB_NAME" < "$temp_file" 2>/dev/null
             if [ $? -ne 0 ]; then
                 echo "Error: Failed to import production database"
@@ -145,12 +218,22 @@ db_operation() {
             fi
 
             echo "Updating URLs..."
-            # Use direct MySQL command for search-replace
+            # Update using direct MySQL commands for better reliability
             cat > "${BACKUP_DIR}/update_urls.sql" << EOF
-UPDATE wp_options SET option_value = replace(option_value, 'https://masumihayashifoundation.org', 'https://masumihayashifoundationorg.local') WHERE option_name = 'home' OR option_name = 'siteurl';
-UPDATE wp_posts SET guid = replace(guid, 'https://masumihayashifoundation.org', 'https://masumihayashifoundationorg.local');
-UPDATE wp_posts SET post_content = replace(post_content, 'https://masumihayashifoundation.org', 'https://masumihayashifoundationorg.local');
-UPDATE wp_postmeta SET meta_value = replace(meta_value, 'https://masumihayashifoundation.org', 'https://masumihayashifoundationorg.local');
+# Update core WordPress URLs
+UPDATE wp_options SET option_value = REPLACE(option_value, 'https://masumihayashifoundation.org', 'https://masumihayashifoundationorg.local') WHERE option_name IN ('home', 'siteurl');
+
+# Update post GUIDs
+UPDATE wp_posts SET guid = REPLACE(guid, 'https://masumihayashifoundation.org', 'https://masumihayashifoundationorg.local');
+
+# Update post content
+UPDATE wp_posts SET post_content = REPLACE(post_content, 'https://masumihayashifoundation.org', 'https://masumihayashifoundationorg.local');
+
+# Update post meta
+UPDATE wp_postmeta SET meta_value = REPLACE(meta_value, 'https://masumihayashifoundation.org', 'https://masumihayashifoundationorg.local') WHERE meta_value LIKE '%https://masumihayashifoundation.org%';
+
+# Update serialized data in options
+UPDATE wp_options SET option_value = REPLACE(REPLACE(option_value, 's:55:"https://masumihayashifoundation.org', 's:61:"https://masumihayashifoundationorg.local'), 's:31:"https://masumihayashifoundation', 's:37:"https://masumihayashifoundationorg') WHERE option_name LIKE '%theme_mods%' OR option_name LIKE '%custom%color%' OR option_name LIKE '%nav_menu%';
 EOF
 
             "$MYSQL_PATH" "${MYSQL_OPTS[@]}" "$DB_NAME" < "${BACKUP_DIR}/update_urls.sql" 2>/dev/null
