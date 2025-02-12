@@ -1,12 +1,23 @@
-path: .
+path: app/public
 url: https://masumihayashifoundationorg.local
 apache_modules:
   - mod_rewrite
 
+# Database configuration
+database:
+  name: local
+  user: root
+  password: root
+  host: 127.0.0.1
+  port: 10019
+  socket: /Users/DK-SuperPuppy/Library/Application Support/Local/run/MIK2JKL-s/mysql/mysqld.sock
+
 # Production environment configuration
-# Replace these values with your actual production server details:
-# - username: Your SSH username
-# - hostname: Your server's hostname or IP
-# - /path/to/wordpress: Absolute path to WordPress installation
 '@prod':
-  ssh: 'wp_jqukgi@dp-4d7888eaf4:/home/wp_jqukgi/masumihayashifoundation.org'
+  ssh: wp_jqukgi@masumihayashifoundation:/home/wp_jqukgi/masumihayashifoundation.org/
+  url: https://masumihayashifoundation.org
+  database:
+    name: masumihayashifoundation__2
+    user: z2d9giq
+    password: dean70?!
+    host: mysql.masumihayashifoundation.org
