@@ -1,0 +1,11 @@
+{
+  "readOnlyPaths": [
+    "app/public/wp-admin",
+    "app/public/wp-includes",
+    "app/public/*.php"
+  ],
+  "editablePaths": [
+    "app/public/wp-content/themes/mhf_tw",
+    "app/public/wp-content/plugins"
+  ]
+}

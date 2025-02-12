@@ -1,0 +1,12 @@
+path: .
+url: https://masumihayashifoundationorg.local
+apache_modules:
+  - mod_rewrite
+
+# Production environment configuration
+# Replace these values with your actual production server details:
+# - username: Your SSH username
+# - hostname: Your server's hostname or IP
+# - /path/to/wordpress: Absolute path to WordPress installation
+'@prod':
+  ssh: 'wp_jqukgi@dp-4d7888eaf4:/home/wp_jqukgi/masumihayashifoundation.org'

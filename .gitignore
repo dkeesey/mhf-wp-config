@@ -1,0 +1,19 @@
+# Ignore everything by default
+*
+
+# But not these files...
+!.gitignore
+!.windsurfrules
+!wp-cli.yml
+!scripts/
+!scripts/**
+
+# Ignore these specific files/directories even if they're in scripts/
+scripts/**/.DS_Store
+scripts/**/node_modules/
+scripts/**/vendor/
+
+# Ignore Mac system files
+.DS_Store
+.AppleDouble
+.LSOverride
