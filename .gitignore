@@ -5,6 +5,7 @@
 !.gitignore
 !.windsurfrules
 !wp-cli.yml
+!README.md
 !scripts/
 !scripts/**
 
