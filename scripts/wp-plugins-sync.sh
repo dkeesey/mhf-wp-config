@@ -19,7 +19,9 @@
 REMOTE_USER="wp_jqukgi"
 REMOTE_HOST="masumihayashifoundation"
 REMOTE_PLUGINS_PATH="/home/wp_jqukgi/masumihayashifoundation.org/wp-content/plugins/"
+REMOTE_MU_PLUGINS_PATH="/home/wp_jqukgi/masumihayashifoundation.org/wp-content/mu-plugins/"
 LOCAL_PLUGINS_PATH="/Volumes/PRO-G40/Workspace-G40/wp-masumihayashifoundation.org/app/public/wp-content/plugins/"
+LOCAL_MU_PLUGINS_PATH="/Volumes/PRO-G40/Workspace-G40/wp-masumihayashifoundation.org/app/public/wp-content/mu-plugins/"
 
 # Function to display usage information
 usage() {
@@ -50,14 +52,26 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Perform the rsync
+# Perform the rsync for regular plugins
 echo "Starting WordPress plugin sync..."
 rsync -avz -e ssh $DRY_RUN "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PLUGINS_PATH" "$LOCAL_PLUGINS_PATH"
 
-# Check the exit status of rsync
+# Check the exit status of regular plugins rsync
 if [ $? -eq 0 ]; then
     echo "Plugin sync completed successfully!"
 else
     echo "Plugin sync encountered an error."
+    exit 1
+fi
+
+# Perform the rsync for mu-plugins
+echo "Starting WordPress mu-plugins sync..."
+rsync -avz -e ssh $DRY_RUN "$REMOTE_USER@$REMOTE_HOST:$REMOTE_MU_PLUGINS_PATH" "$LOCAL_MU_PLUGINS_PATH"
+
+# Check the exit status of mu-plugins rsync
+if [ $? -eq 0 ]; then
+    echo "Mu-plugins sync completed successfully!"
+else
+    echo "Mu-plugins sync encountered an error."
     exit 1
 fi
