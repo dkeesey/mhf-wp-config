@@ -20,8 +20,8 @@ REMOTE_USER="wp_jqukgi"
 REMOTE_HOST="masumihayashifoundation"
 REMOTE_PLUGINS_PATH="/home/wp_jqukgi/masumihayashifoundation.org/wp-content/plugins/"
 REMOTE_MU_PLUGINS_PATH="/home/wp_jqukgi/masumihayashifoundation.org/wp-content/mu-plugins/"
-LOCAL_PLUGINS_PATH="/Volumes/PRO-G40/Workspace-G40/wp-masumihayashifoundation.org/app/public/wp-content/plugins/"
-LOCAL_MU_PLUGINS_PATH="/Volumes/PRO-G40/Workspace-G40/wp-masumihayashifoundation.org/app/public/wp-content/mu-plugins/"
+LOCAL_PLUGINS_PATH="/Volumes/PRO-G40/Workspace-G40/wp-masumihayashifoundation.org-new/app/public/wp-content/plugins/"
+LOCAL_MU_PLUGINS_PATH="/Volumes/PRO-G40/Workspace-G40/wp-masumihayashifoundation.org-new/app/public/wp-content/mu-plugins/"
 
 # Function to display usage information
 usage() {

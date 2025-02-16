@@ -22,7 +22,7 @@
 REMOTE_USER="wp_jqukgi"
 REMOTE_HOST="masumihayashifoundation"
 REMOTE_THEMES_PATH="/home/wp_jqukgi/masumihayashifoundation.org/wp-content/themes/"
-LOCAL_THEMES_PATH="/Volumes/PRO-G40/Workspace-G40/wp-masumihayashifoundation.org/app/public/wp-content/themes/"
+LOCAL_THEMES_PATH="/Volumes/PRO-G40/Workspace-G40/wp-masumihayashifoundation.org-new/app/public/wp-content/themes/"
 
 # Function to display usage information
 usage() {
